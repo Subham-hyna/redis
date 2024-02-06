@@ -1,24 +1,38 @@
 import express from "express";
 import axios from "axios"
 import { createClient } from 'redis';
+import NodeCache from "node-cache" ;
+const myCache = new NodeCache();
 
 const app = express();
 
-const client = createClient();
+// const client = createClient({
+    
+//     password: "Z9GvJgDrNQbm7sJxgHVl5kJwZUga3IZK",
+//     socket: {
+//         host: "redis-17978.c274.us-east-1-3.ec2.cloud.redislabs.com",
+//         port: 17978
+//     }
+// });
 
-client.on('error', err => console.log('Redis Client Error', err));
+// client.on('error', err => console.log('Redis Client Error', err));
 
-await client.connect();
+// await client.connect();
 
 app.get("/",async(req,res)=>{
     
-    const cachedValue = await client.get("todos");
-    if(cachedValue) return res.json(JSON.parse(cachedValue));
+    // const cachedValue = await client.get("todos");
+    // if(cachedValue) return res.json(JSON.parse(cachedValue));
+
+    const cachedValue = myCache.get("todos");
+    if(cachedValue) return res.json(cachedValue);
 
     const { data } = await axios.get("https://jsonplaceholder.typicode.com/todos");
 
-    await client.set("todos",JSON.stringify(data));
-    await client.expire("todos",30);
+    myCache.set("todos",data,30);
+
+    // await client.set("todos",JSON.stringify(data));
+    // await client.expire("todos",30);
 
     res.status(200).json(data);
 })
