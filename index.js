@@ -25,16 +25,24 @@ app.get("/",async(req,res)=>{
     // if(cachedValue) return res.json(JSON.parse(cachedValue));
 
     const cachedValue = myCache.get("todos");
-    if(cachedValue) return res.json(cachedValue);
+    if(cachedValue) return res.json({message:"cac"});
 
-    const { data } = await axios.get("https://jsonplaceholder.typicode.com/todos");
+    const { data1 } = await axios.get("https://jsonplaceholder.typicode.com/todos");
+    const { data2 } = await axios.get("https://jsonplaceholder.typicode.com/todos");
+    const { data3 } = await axios.get("https://jsonplaceholder.typicode.com/todos");
 
-    myCache.set("todos",data,30);
+    const todos = {
+        data1,
+        data2,
+        data3
+    }
+
+    myCache.set("todos",todos,10);
 
     // await client.set("todos",JSON.stringify(data));
     // await client.expire("todos",30);
 
-    res.status(200).json(data);
+    res.status(200).json({success: true});
 })
 
 const PORT = process.env.PORT || 4000;
